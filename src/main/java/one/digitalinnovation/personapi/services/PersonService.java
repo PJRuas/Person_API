@@ -17,6 +17,11 @@ import java.util.stream.Collectors;
 @AllArgsConstructor(onConstructor = @__(@Autowired))
 public class PersonService {
 
+    private Person verifyIfExistis(Long id) throws PersonNotFoundException {
+        return personRepository.findById(id)
+                .orElseThrow(() -> new PersonNotFoundException(id));
+    }
+
     private final PersonRepository personRepository;
 
     private final PersonMapper personMapper;
@@ -31,8 +36,7 @@ public class PersonService {
     }
 
     public PersonDTO findById(Long id) throws PersonNotFoundException {
-        Person person = personRepository.findById(id)
-                .orElseThrow(() -> new PersonNotFoundException(id));
+        Person person = verifyIfExistis(id);
 
         return personMapper.toDTO(person);
     }
@@ -45,8 +49,7 @@ public class PersonService {
     }
 
     public MessageResponseDTO update(Long id, PersonDTO personDTO) throws PersonNotFoundException {
-        personRepository.findById(id)
-                .orElseThrow(() -> new PersonNotFoundException(id));
+        verifyIfExistis(id);
 
         Person updatedPerson = personMapper.toModel(personDTO);
         Person savedPerson = personRepository.save(updatedPerson);
@@ -57,8 +60,7 @@ public class PersonService {
     }
 
     public void delete(Long id) throws PersonNotFoundException {
-        personRepository.findById(id)
-                .orElseThrow(() -> new PersonNotFoundException(id));
+        verifyIfExistis(id);
 
         personRepository.deleteById(id);
     }
